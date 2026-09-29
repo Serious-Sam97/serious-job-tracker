@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  WISHLIST
+  APPLIED
+  SCREENING
+  INTERVIEWING
+  OFFER
+  ACCEPTED
+  REJECTED
+  GHOSTED
+  WITHDRAWN
+}
+
+enum WorkMode {
+  REMOTE
+  HYBRID
+  ONSITE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum UpdateType {
+  NOTE
+  STATUS_CHANGE
+  INTERVIEW
+  EMAIL
+  CALL
+  FOLLOW_UP
+  OTHER
+}
+
+model Application {
+  id          Int       @id @default(autoincrement())
+  company     String
+  role        String
+  url         String?
+  location    String?
+  workMode    WorkMode?
+  salaryMin   Int?
+  salaryMax   Int?
+  currency    String?
+  source      String?
+  status      Status    @default(APPLIED)
+  priority    Priority  @default(MEDIUM)
+  appliedAt   DateTime?
+  followUpAt  DateTime?
+  description String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  updates     Update[]
+  contacts    Contact[]
+
+  @@index([status])
+  @@index([followUpAt])
+}
+
+model Update {
+  id            Int         @id @default(autoincrement())
+  applicationId Int
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  type          UpdateType  @default(NOTE)
+  content       String
+  date          DateTime    @default(now())
+  fromStatus    Status?
+  toStatus      Status?
+  createdAt     DateTime    @default(now())
+
+  @@index([applicationId, date])
+}
+
+model Contact {
+  id            Int         @id @default(autoincrement())
+  applicationId Int
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  name          String
+  title         String?
+  email         String?
+  phone         String?
+  linkedin      String?
+  notes         String?
+  createdAt     DateTime    @default(now())
+
+  @@index([applicationId])
+}
+
+model Setting {
+  key   String @id
+  value Json
+}

@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ApiError } from "./api";
 import { ToastProvider } from "./components/Toast";
 import App from "./App";
+import "@fontsource-variable/fraunces";
+import "@fontsource-variable/inter";
 import "./styles.css";
 
 const queryClient = new QueryClient({

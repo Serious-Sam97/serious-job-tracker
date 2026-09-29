@@ -1,13 +1,13 @@
 # Local development: hot reload for api + web, Postgres exposed on 5433.
-name: job-tracker
+name: serious-job-tracker
 
 services:
   db:
     image: postgres:17-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-jobtracker}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jobtracker}
-      POSTGRES_DB: ${POSTGRES_DB:-jobtracker}
+      POSTGRES_USER: ${POSTGRES_USER:-seriousjobtracker}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-seriousjobtracker}
+      POSTGRES_DB: ${POSTGRES_DB:-seriousjobtracker}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -23,7 +23,7 @@ services:
       context: ./api
       target: dev
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-jobtracker}:${POSTGRES_PASSWORD:-jobtracker}@db:5432/${POSTGRES_DB:-jobtracker}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-seriousjobtracker}:${POSTGRES_PASSWORD:-seriousjobtracker}@db:5432/${POSTGRES_DB:-seriousjobtracker}
       PORT: 4000
       AUTH_ENABLED: ${AUTH_ENABLED:-false}
       APP_PASSWORD: ${APP_PASSWORD:-}

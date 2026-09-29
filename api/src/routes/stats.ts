@@ -36,6 +36,7 @@ stats.get("/", async (_req, res) => {
       select: { id: true, company: true, role: true, status: true, followUpAt: true },
     }),
     prisma.update.findMany({
+      where: { date: { lte: new Date() } },
       orderBy: [{ date: "desc" }, { id: "desc" }],
       take: 8,
       include: { application: { select: { id: true, company: true, role: true } } },

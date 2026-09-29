@@ -26,7 +26,7 @@ export default function Today() {
           <h1 className="today-greeting">{greeting()}.</h1>
           <p className="today-summary">
             {fresh ? (
-              "Let’s get your search organised."
+              "Let’s get your search organized."
             ) : n ? (
               <>
                 <strong>

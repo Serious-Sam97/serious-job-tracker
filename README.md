@@ -1,4 +1,4 @@
-# Job Tracker
+# Serious Job Tracker
 
 Track the jobs you apply to: details of each vacancy, a timeline of updates, recruiter contacts, and follow-up reminders.
 
@@ -12,7 +12,7 @@ docker compose up -d --build
 
 - App: http://localhost:5173
 - API: http://localhost:4000/api/health
-- Postgres: `localhost:5433` (user/pass/db `jobtracker`)
+- Postgres: `localhost:5433` (user/pass/db `seriousjobtracker`)
 
 Code in `api/` and `web/` is mounted into the containers, so edits hot-reload. No `.env` is needed for local use.
 
@@ -30,14 +30,14 @@ docker compose up -d --build -V
 
 ## Features
 
-- **Applications** — company, role, posting URL, location, remote/hybrid/on-site, salary range, source, priority, notes, and the full job description (paste it; postings disappear).
-- **Statuses** — Wishlist → Applied → Screening → Interviewing → Offer → Accepted, plus Rejected / Ghosted / Withdrawn. Every change is logged to the timeline automatically.
-- **Board** — Kanban view; drag cards between columns to change status (Space to pick up with the keyboard).
-- **Table** — search (company, role, location, source, notes), status filter chips, sorting, CSV export of the current view.
-- **Timeline** — notes, interviews, emails, calls, follow-ups, each with a date. `⌘/Ctrl + Enter` to add.
-- **Contacts** — recruiters / hiring managers per application, plus a Contacts page across all of them.
-- **Follow-ups** — set a date (or +3d / +1w / +2w), see overdue/today/upcoming on the dashboard, and “I followed up” logs it and clears the reminder.
-- **Dashboard** — active count, response and interview rates, offers, applications per week, pipeline by status, recent activity.
+- **Today** (home) — what needs you now: follow-ups due or overdue, interviews today, and applications that have gone quiet (no activity for 21+ days) with one-click actions. "Coming up" lists interviews and follow-ups for the next two weeks, and a weekly application goal tracks your pace.
+- **Applications** — split view: list on the left (search, open/all/status filter, sort, CSV export), details on the right with a stage progress bar, status/priority/follow-up controls, timeline, notes, contacts and the job description.
+  Keys: `j`/`k` move, `/` search, `n` new, `e` edit, `Esc` close.
+- **⌘K / Ctrl+K** — command palette: jump to any application or page.
+- **Timeline** — notes, interviews, emails, calls, follow-ups. Log an interview with a future date to schedule it; it shows up on Today. `⌘/Ctrl + Enter` to add.
+- **Board** — Kanban; drag cards between columns to change status.
+- **Insights** — response and interview rates, applications per week, pipeline by status, recent activity.
+- **Contacts** — recruiters / hiring managers per application, plus a page listing all of them.
 
 ## Project layout
 
@@ -47,10 +47,11 @@ api/
   prisma/migrations/        SQL migrations, applied on container start
   src/index.ts              Express app
   src/auth.ts               optional single-password login
-  src/routes/               applications, updates/contacts, stats
+  src/routes/               applications, updates/contacts, stats, today + settings
 web/
-  src/pages/                Dashboard, Applications (table + board), detail, form, contacts, login
-  src/components/           Board, Timeline, ContactsPanel, charts, ui
+  src/pages/                Today, Workspace (split view), detail, form, Board, Insights, Contacts, Login
+  src/components/           Board, Timeline, ContactsPanel, StageBar, CommandPalette, charts, ui
+  src/styles.css            design tokens (warm editorial, light + dark) and all styles
   nginx.conf                prod: serves the build and proxies /api
 docker-compose.yml          dev
 docker-compose.prod.yml     prod
@@ -76,7 +77,8 @@ All under `/api` (JSON). Requires the session cookie when login is enabled.
 | GET | `/applications/export.csv` | same filters as list |
 | POST | `/applications/:id/updates` · `/applications/:id/contacts` | add |
 | PATCH/DELETE | `/updates/:id` · `/contacts/:id` | edit / remove |
-| GET | `/contacts` · `/stats` | |
+| GET | `/contacts` · `/stats` · `/today?today=YYYY-MM-DD&weekStart=YYYY-MM-DD` | |
+| GET/PATCH | `/settings` | `{ weeklyGoal }` |
 | GET/POST | `/auth/me` · `/auth/login` · `/auth/logout` | |
 
 ## Deploying (later)
@@ -100,5 +102,5 @@ Failed logins are limited to 10 per 15 minutes.
 **Backups:**
 
 ```bash
-docker compose -f docker-compose.prod.yml exec db pg_dump -U "$POSTGRES_USER" jobtracker > backup-$(date +%F).sql
+docker compose -f docker-compose.prod.yml exec db pg_dump -U "$POSTGRES_USER" seriousjobtracker > backup-$(date +%F).sql
 ```

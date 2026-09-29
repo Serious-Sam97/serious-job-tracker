@@ -13,7 +13,7 @@ export default class ErrorBoundary extends Component<{ children: ReactNode }, { 
       <div className="error-box">
         <strong>Something broke on this page.</strong>
         <p>{this.state.error.message}</p>
-        <button className="btn btn-ghost btn-sm" onClick={() => location.reload()}>
+        <button className="btn btn-sm" onClick={() => location.reload()}>
           Reload
         </button>
       </div>

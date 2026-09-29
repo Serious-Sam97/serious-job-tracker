@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError, type ApplicationDetail, type ApplicationInput } from "../api";
 import { PRIORITY_LABEL, SOURCES, STATUSES, STATUS_LABEL, WORK_MODE_LABEL } from "../constants";
@@ -55,6 +56,8 @@ function Form({ app }: { app?: ApplicationDetail }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const toast = useToast();
+  const [params] = useSearchParams();
+  const qs = params.toString() ? `?${params}` : "";
   const [f, setF] = useState<FormState>(() => initialState(app));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -70,7 +73,7 @@ function Form({ app }: { app?: ApplicationDetail }) {
         } catch {}
       }
       toast(app ? "Application saved" : "Application added");
-      navigate(`/applications/${saved.id}`);
+      navigate(`/applications/${saved.id}${qs}`);
     },
     onError: (err) => {
       if (err instanceof ApiError && err.issues.length) {
@@ -102,22 +105,20 @@ function Form({ app }: { app?: ApplicationDetail }) {
   );
 
   return (
-    <div className="page page-narrow">
-      <div className="page-head">
-        <div>
-          <Link to={app ? `/applications/${app.id}` : "/applications"} className="back">
-            ← {app ? `${app.company}` : "Applications"}
-          </Link>
-          <h1>{app ? "Edit application" : "New application"}</h1>
-        </div>
-      </div>
+    <div className="pane-inner" style={{ maxWidth: 760 }}>
+      <Link to={app ? `/applications/${app.id}${qs}` : `/applications${qs}`} className="back">
+        <ArrowLeft /> {app ? app.company : "Applications"}
+      </Link>
+      <h1 className="form-title">{app ? `Edit ${app.company}` : "New application"}</h1>
 
-      <form className="card form" onSubmit={submit} noValidate>
+      <form className="form" onSubmit={submit} noValidate>
         <fieldset>
           <legend>The job</legend>
           <div className="grid-2">
-            {field("company", "Company *", <input value={f.company} onChange={set("company")} autoFocus={!app} />)}
-            {field("role", "Role / title *", <input value={f.role} onChange={set("role")} />)}
+            <div className="field-wide big-input">
+              {field("company", "Company *", <input value={f.company} onChange={set("company")} autoFocus={!app} placeholder="Acme Inc." />)}
+            </div>
+            {field("role", "Role / title *", <input value={f.role} onChange={set("role")} placeholder="Senior Frontend Engineer" />, true)}
             {field("url", "Job posting URL", <input type="url" value={f.url} onChange={set("url")} placeholder="https://…" />, true)}
             {field("location", "Location", <input value={f.location} onChange={set("location")} placeholder="City, country" />)}
             {field(
@@ -199,7 +200,7 @@ function Form({ app }: { app?: ApplicationDetail }) {
         </fieldset>
 
         <div className="form-actions">
-          <button type="button" className="btn btn-ghost" onClick={() => navigate(-1)}>
+          <button type="button" className="btn btn-quiet" onClick={() => navigate(-1)}>
             Cancel
           </button>
           <button className="btn btn-primary" disabled={save.isPending}>

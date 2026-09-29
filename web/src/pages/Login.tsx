@@ -25,12 +25,15 @@ export default function Login() {
   return (
     <div className="login">
       <form className="card login-card" onSubmit={submit}>
-        <h1>
+        <div className="brand">
           <span className="brand-mark" aria-hidden>
-            ◆
-          </span>{" "}
-          Job Tracker
-        </h1>
+            S
+          </span>
+          <span>
+            <em>Serious</em> Job Tracker
+          </span>
+        </div>
+        <p className="login-sub">Welcome back.</p>
         <label className="field">
           <span>Password</span>
           <input type="password" autoFocus value={password} onChange={(e) => setPassword(e.target.value)} />

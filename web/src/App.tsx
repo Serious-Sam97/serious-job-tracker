@@ -57,8 +57,10 @@ export default function App() {
     <div className="shell">
       <aside className="sidebar">
         <Link to="/" className="brand">
-          <span className="brand-mark">j</span>
-          Job Tracker
+          <span className="brand-mark">S</span>
+          <span>
+            <em>Serious</em> Job Tracker
+          </span>
         </Link>
         <button className="side-btn side-search" onClick={() => setPaletteOpen(true)} aria-label="Search">
           <Search />

@@ -48,14 +48,23 @@ export default function Workspace() {
   const listParams = { q, sort, status };
   const { data: apps, isPending } = useQuery({ queryKey: ["applications", listParams], queryFn: () => api.list(listParams) });
 
+  // Rapid key presses can outrun re-renders, so track the current row outside React state.
+  const cursor = useRef<number | null>(selectedId);
+  useEffect(() => {
+    cursor.current = selectedId;
+  }, [selectedId]);
+
   // Keep the search params when moving between applications.
   const qs = params.toString() ? `?${params}` : "";
-  const open = (id: number) => navigate(`/applications/${id}${qs}`);
+  const open = (id: number) => {
+    cursor.current = id;
+    navigate(`/applications/${id}${qs}`);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey || isTyping(e) || !apps) return;
-      const idx = apps.findIndex((a) => a.id === selectedId);
+      const idx = apps.findIndex((a) => a.id === cursor.current);
       if (e.key === "j" || e.key === "ArrowDown") {
         const next = apps[Math.min(apps.length - 1, idx + 1)];
         if (next) open(next.id);
@@ -174,7 +183,7 @@ export default function Workspace() {
         )}
         <div className="list-foot">
           <span>
-            {apps?.length ?? 0} shown · <kbd>j</kbd> <kbd>k</kbd> to move
+            {apps?.length ?? 0} shown<span className="key-hint"> · <kbd>j</kbd> <kbd>k</kbd> to move</span>
           </span>
           <a href={`/api/applications/export.csv${listQuery(listParams)}`} download title="Export these as CSV">
             <Download size={13} style={{ verticalAlign: "-2px" }} /> CSV

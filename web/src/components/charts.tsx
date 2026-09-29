@@ -60,7 +60,7 @@ export function StatusBars({ byStatus, order }: { byStatus: Record<Status, numbe
         <button
           key={s}
           className="hbar-row"
-          onClick={() => navigate(`/applications?view=table&status=${s}`)}
+          onClick={() => navigate(`/applications?filter=${s}`)}
           title={`${STATUS_LABEL[s]}: ${byStatus[s]} — click to view`}
         >
           <span className="hbar-label">

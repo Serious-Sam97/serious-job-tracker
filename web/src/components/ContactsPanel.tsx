@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ExternalLink, Mail, Phone } from "lucide-react";
 import { api, type Contact, type ContactInput } from "../api";
 import { useToast } from "./Toast";
 
@@ -16,17 +17,17 @@ export default function ContactsPanel({ appId, contacts }: { appId: number; cont
   });
 
   return (
-    <section className="card">
+    <section>
       <div className="card-title-row">
-        <h2 className="card-title">Contacts</h2>
+        <h2 className="section-title">Contacts</h2>
         {editing !== "new" && (
-          <button className="btn btn-ghost btn-sm" onClick={() => setEditing("new")}>
-            + Add
+          <button className="link-btn" onClick={() => setEditing("new")}>
+            + Add contact
           </button>
         )}
       </div>
       {editing === "new" && <ContactForm appId={appId} onDone={() => setEditing(null)} />}
-      {contacts.length === 0 && editing !== "new" && <p className="muted">No contacts yet — add the recruiter or hiring manager.</p>}
+      {contacts.length === 0 && editing !== "new" && <p className="muted small">No contacts yet. Add the recruiter or hiring manager.</p>}
       <ul className="contacts">
         {contacts.map((c) =>
           editing === c.id ? (
@@ -61,11 +62,19 @@ export function ContactLinks({ contact: c }: { contact: Contact }) {
   const linkedin = c.linkedin && (/^https?:\/\//.test(c.linkedin) ? c.linkedin : `https://${c.linkedin}`);
   return (
     <div className="contact-links">
-      {c.email && <a href={`mailto:${c.email}`}>{c.email}</a>}
-      {c.phone && <a href={`tel:${c.phone}`}>{c.phone}</a>}
+      {c.email && (
+        <a href={`mailto:${c.email}`}>
+          <Mail /> {c.email}
+        </a>
+      )}
+      {c.phone && (
+        <a href={`tel:${c.phone}`}>
+          <Phone /> {c.phone}
+        </a>
+      )}
       {linkedin && (
         <a href={linkedin} target="_blank" rel="noreferrer">
-          LinkedIn ↗
+          <ExternalLink /> LinkedIn
         </a>
       )}
     </div>
@@ -103,7 +112,7 @@ function ContactForm({ appId, contact, onDone }: { appId: number; contact?: Cont
         <textarea className="field-wide" rows={2} placeholder="Notes" value={f.notes} onChange={set("notes")} aria-label="Notes" />
       </div>
       <div className="add-update-row">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={onDone}>
+        <button type="button" className="btn btn-quiet btn-sm" onClick={onDone}>
           Cancel
         </button>
         <button className="btn btn-primary btn-sm" disabled={!f.name.trim() || save.isPending}>
